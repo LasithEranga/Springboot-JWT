@@ -21,6 +21,11 @@ public class SpringsecApplication {
 	}
 
 	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
 	CommandLineRunner run(UserService userService) {
 		return args -> {
 			userService.saveRole(new Role(null, "ROLE_USER"));
@@ -37,11 +42,6 @@ public class SpringsecApplication {
 			userService.addRoleToUser("lasith", "ROLE_USER");
 			userService.addRoleToUser("lasith", "ROLE_ADMIN");
 		};
-	}
-
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
 	}
 
 }
