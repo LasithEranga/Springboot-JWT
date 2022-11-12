@@ -3,19 +3,12 @@ package com.springsec.controller;
 import com.springsec.model.Role;
 import com.springsec.model.User;
 import com.springsec.service.UserService;
-
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -37,8 +30,6 @@ public class UserController {
     @PostMapping("/user/save")
     public ResponseEntity<User> saveUsers(@RequestBody User user) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        log.info("password {}", user.getPassword());
         return ResponseEntity.created(uri).body(userService.saveUser(user));
     }
 
