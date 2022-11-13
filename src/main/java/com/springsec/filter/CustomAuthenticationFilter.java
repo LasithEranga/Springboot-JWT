@@ -2,6 +2,7 @@ package com.springsec.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,14 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,12 +37,16 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        log.info("Loggin user {} password {}", username, password);
+        ObjectMapper mapper = new ObjectMapper();
+        com.springsec.model.User user = null;
+        try {
+            user = mapper.readValue(request.getInputStream(),com.springsec.model.User.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        log.info("Loggin user {} password {}", user.getUsername(), user.getPassword());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                username, password);
+                user.getUsername(), user.getPassword());
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
     }
 
@@ -57,6 +67,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .sign(algorithm);
 
         response.setHeader("accessTocken", accessTocken);
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("token",accessTocken);
+        response.setContentType("application/json");
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
 }

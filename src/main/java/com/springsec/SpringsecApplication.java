@@ -3,6 +3,7 @@ package com.springsec;
 import com.springsec.model.Role;
 import com.springsec.model.User;
 import com.springsec.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +25,14 @@ public class SpringsecApplication {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public ModelMapper modelMapper(){
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+        return modelMapper;
+    }
+
     @Bean
     CommandLineRunner run(UserService userService) {
         return args -> {
@@ -36,10 +45,11 @@ public class SpringsecApplication {
             userService.saveUser(new User(null, "Eranda", "eranda", "123456", new ArrayList<>()));
             userService.saveUser(new User(null, "Handapangoda", "handapangoda", "123456", new ArrayList<>()));
 
-            userService.addRoleToUser("lasith", "ROLE_SUPERADMIN");
-            userService.addRoleToUser("lasith", "ROLE_MANAGER");
             userService.addRoleToUser("lasith", "ROLE_USER");
             userService.addRoleToUser("lasith", "ROLE_ADMIN");
+
+            userService.addRoleToUser("eranda", "ROLE_USER");
+
         };
     }
 
